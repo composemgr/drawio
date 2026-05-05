@@ -21,8 +21,8 @@ services:
       PUID: ${SERVICE_USER:-1000}
       PGID: ${SERVICE_GROUP:-1000}
     volumes:
-      - ./rootfs/config/drawio:/config
-      - ./rootfs/data/drawio:/data
+      - ./volumes/config/drawio:/config
+      - ./volumes/data/drawio:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
