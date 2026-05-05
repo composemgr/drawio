@@ -47,8 +47,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/config/drawio` - Data storage
-- `./rootfs/data/drawio` - Data storage
+- `./volumes/config/drawio` - Data storage
+- `./volumes/data/drawio` - Data storage
 
 ## 🔍 Logging
 
