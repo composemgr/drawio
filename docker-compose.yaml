@@ -16,17 +16,41 @@ services:
     logging: *default-logging
     networks:
       - drawio
+      - proxy
+      - cloudflare
     ports:
       - "172.17.0.1:8090:8080"
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: drawio-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://drawio-app:8080'
+      - 'cloudflare.hostname=drawio.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.drawio-app.entrypoints=http'
+      - 'traefik.http.routers.drawio-app-secure.tls=true'
+      - 'traefik.http.routers.drawio-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.drawio-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.drawio-app.middlewares=drawio-app-https-redirect'
+      - 'traefik.http.routers.drawio-app-secure.entrypoints=https'
+      - 'traefik.http.routers.drawio-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.drawio-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.drawio-app-secure.service=drawio-app'
+      - 'traefik.http.services.drawio-app.loadbalancer.server.port=8080'
 
 networks:
   drawio:
     name: drawio
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
