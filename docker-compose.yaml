@@ -1,5 +1,6 @@
 # nginx proxy address - http://172.17.0.1:8090
 
+name: drawio
 x-logging: &default-logging
   driver: json-file
   options:
@@ -9,20 +10,16 @@ x-logging: &default-logging
 services:
   drawio:
     image: jgraph/drawio:latest
+    pull_policy: always
     container_name: drawio-app
-    restart: unless-stopped
+    restart: always
     logging: *default-logging
     networks:
       - drawio
     ports:
-      - "8090:8080"
+      - "172.17.0.1:8090:8080"
     environment:
       TZ: ${TZ:-America/New_York}
-      PUID: ${SERVICE_USER:-1000}
-      PGID: ${SERVICE_GROUP:-1000}
-    volumes:
-      - ./volumes/config/drawio:/config
-      - ./volumes/data/drawio:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
@@ -31,4 +28,5 @@ services:
 
 networks:
   drawio:
+    name: drawio
     external: false
